@@ -57,6 +57,7 @@ jQuery(document).ready(function($) {
 
     // Perform AJAX Set password on form submit
     $('form#form-setpassword').on('submit',function(e){
+      console.log($('form#form-setpassword').find('.g-recaptcha-response').val());
       $('form#form-setpassword p.status').show().removeClass('alert-success alert-danger').text(ajax_auth_object.loadingmessage);
       if($('#sp-password').val()==$('#sp-cpassword').val()&&$('#sp-password').val().length){
         var pw_len = $('#sp-password').val().length;
@@ -71,6 +72,7 @@ jQuery(document).ready(function($) {
               'cpassword': $('#sp-cpassword').val(),
               'email': $('#sp-email').val(),
               'confirm': $('#sp-confirm').val(),
+              'recaptcha': $('form#form-setpassword').find('.g-recaptcha-response').val(),
               'security': $('#setpasswordsecurity').val()
             },
             success: function (data) {
@@ -80,7 +82,7 @@ jQuery(document).ready(function($) {
                 $('form#form-setpassword p.status').show().html(data.message);
                 document.location.href = ajax_auth_object.redirecturl;
               }else{
-                $('form#form-setpassword p.status').show().html(alert_ico+'Setting password failed ').removeClass('alert-success').addClass('alert-danger');
+                $('form#form-setpassword p.status').show().html(alert_ico+'Setting password failed '+data.message).removeClass('alert-success').addClass('alert-danger');
               }
             }
           });
@@ -91,6 +93,32 @@ jQuery(document).ready(function($) {
         $('form#form-setpassword p.status').show().html(alert_ico+'Passwords don\'t match').removeClass('alert-success').addClass('alert-danger');
       }
       e.preventDefault();
-    })
+    });
+
+    // Perform AJAX Reset password on form submit
+    $('form#form-resetpassword').on('submit',function(e){
+      $('form#form-resetpassword p.status').show().removeClass('alert-success alert-danger').text(ajax_auth_object.loadingmessage);
+      $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: ajax_auth_object.ajaxurl,
+        data: {
+          'action': 'ajaxresetpassword',
+          'email': $('#rp-email').val(),
+          'security': $('#resetpasswordsecurity').val()
+        },
+        success: function (data) {
+          if (data.status == 1) {
+            $('.btn-savepassword').addClass('disabled');
+            $('.btn-savepassword, form#form-resetpassword input').prop('disabled',true);
+            $('form#form-resetpassword p.status').show().html(data.message);
+            document.location.href = ajax_auth_object.redirecturl;
+          }else{
+            $('form#form-resetpassword p.status').show().html(alert_ico+'Setting password failed ').removeClass('alert-success').addClass('alert-danger');
+          }
+        }
+      });
+      e.preventDefault();
+    });
 
 });

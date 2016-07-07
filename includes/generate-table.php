@@ -78,7 +78,7 @@ class User_List extends WP_List_Table {
 
 	/** Text displayed when no customer data is available */
 	public function no_items() {
-		_e( 'No customers avaliable.', 'sp' );
+		_e( 'No Users Avaliable.', 'sp' );
 	}
 
 
@@ -166,7 +166,8 @@ class User_List extends WP_List_Table {
 	public function get_sortable_columns() {
 		$sortable_columns = array(
 			'display_name' => array( 'display_name', true ),
-			'ID' => array( 'ID', false )
+			'ID' => array( 'ID', false ),
+			'fullname' => array( 'Full Name', false )
 		);
 
 		return $sortable_columns;
@@ -197,7 +198,7 @@ class User_List extends WP_List_Table {
 		/** Process bulk action */
 		$this->process_bulk_action();
 
-		$per_page     = $this->get_items_per_page( 'customers_per_page', 10 );
+		$per_page     = $this->get_items_per_page( 'users_per_page', 10 );
 		$current_page = $this->get_pagenum();
 		$total_items  = self::record_count();
 
@@ -258,14 +259,19 @@ class SP_Plugin {
 	static $instance;
 
 	// customer WP_List_Table object
-	public $customers_obj;
+	public $userlist;
 
 	// class constructor
 	public function __construct() {
 		add_filter( 'set-screen-option', [ __CLASS__, 'set_screen' ], 10, 3 );
+    add_action('admin_init', [$this, 'admin_init']);
 		add_action( 'admin_menu', [ $this, 'plugin_menu' ] );
 	}
 
+	public function admin_init(){
+		register_setting('caf-recaptcha-settings', 'caf_recaptcha_site_key');
+		register_setting('caf-recaptcha-settings', 'caf_recaptcha_client_key');
+	}
 
 	public static function set_screen( $status, $option, $value ) {
 		return $value;
@@ -273,11 +279,11 @@ class SP_Plugin {
 
 	public function plugin_menu() {
 
-		$hook = add_menu_page(
+		$hook = add_options_page(
 			'Custom Auth Form',
 			'Custom Auth Form',
 			'manage_options',
-			'wp_list_table_class',
+			'user-list',
 			[ $this, 'plugin_settings_page' ]
 		);
 
@@ -293,21 +299,44 @@ class SP_Plugin {
 		?>
 		<div class="wrap">
 			<h2>Custom Auth Form</h2>
-
 			<div id="poststuff">
 				<div id="post-body" class="metabox-holder columns-2">
 					<div id="post-body-content">
 						<div class="meta-box-sortables ui-sortable">
 							<form method="post">
 								<?php
-								$this->customers_obj->prepare_items();
-								$this->customers_obj->display(); ?>
+								$this->userlist->prepare_items();
+								$this->userlist->display(); ?>
 							</form>
 						</div>
 					</div>
 				</div>
 				<br class="clear">
 			</div>
+			<form method="post" action="options.php">
+		    <?php settings_fields( 'caf-recaptcha-settings' ); ?>
+		    <?php do_settings_sections( 'caf-recaptcha-settings' ); ?>
+		    <table class="form-table">
+		      <tr valign="top">
+		        <th scope="row" colspan="2">Google Recaptcha Settings</th>
+		      </tr>
+		      <tr>
+		        <td width="300px">
+		          <label>Google Secret Key</label><br>
+		          <small>Used by the server to interact with google.</small>
+		        </td>
+		        <td><input type="text" name="caf_recaptcha_site_key" value="<?php echo esc_attr( get_option('caf_recaptcha_site_key') ); ?>" / style="min-width:300px;"></td>
+		      </tr>
+		      <tr>
+		        <td width="300px">
+		          <label>Google Site Key</label><br>
+		          <small>Used by the browser to interact with the users</small>
+		        </td>
+		        <td><input type="text" name="caf_recaptcha_client_key" value="<?php echo esc_attr( get_option('caf_recaptcha_client_key') ); ?>" / style="min-width:300px;"></td>
+		      </tr>
+		    </table>
+		    <?php submit_button(); ?>
+		  </form>
 		</div>
 	<?php
 	}
@@ -319,14 +348,14 @@ class SP_Plugin {
 
 		$option = 'per_page';
 		$args   = [
-			'label'   => 'Customers',
+			'label'   => 'User per page',
 			'default' => 5,
-			'option'  => 'customers_per_page'
+			'option'  => 'users_per_page'
 		];
 
 		add_screen_option( $option, $args );
 
-		$this->customers_obj = new User_List();
+		$this->userlist = new User_List();
 	}
 
 
