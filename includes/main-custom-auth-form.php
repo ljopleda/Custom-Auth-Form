@@ -1,6 +1,7 @@
 <?php
   class CustomAuthForm{
     public function __construct(){
+      $CustomTemplate = new CustomTemplate();
       $AjaxFunctions = new AjaxFunctions();
       $GenerateShortcode = new GenerateShortcode();
       add_action( 'wp_enqueue_scripts', array( $this, 'load_style' ));

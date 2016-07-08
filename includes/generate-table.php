@@ -5,15 +5,12 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 
 class User_List extends WP_List_Table {
 
-	/** Class constructor */
 	public function __construct() {
-
 		parent::__construct( [
 			'singular' => __( 'User', 'sp' ), //singular name of the listed records
 			'plural'   => __( 'Users', 'sp' ), //plural name of the listed records
 			'ajax'     => false //does this table support ajax?
 		] );
-
 	}
 
 
@@ -25,7 +22,7 @@ class User_List extends WP_List_Table {
 	 *
 	 * @return mixed
 	 */
-	public static function get_customers( $per_page = 5, $page_number = 1 ) {
+	public static function get_users( $per_page = 5, $page_number = 1 ) {
 
 		global $wpdb;
 
@@ -207,7 +204,7 @@ class User_List extends WP_List_Table {
 			'per_page'    => $per_page //WE have to determine how many items to show on a page
 		] );
 
-		$this->items = self::get_customers( $per_page, $current_page );
+		$this->items = self::get_users( $per_page, $current_page );
 	}
 
 	public function process_bulk_action() {

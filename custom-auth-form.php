@@ -16,6 +16,7 @@
   require_once( ABSPATH . "wp-includes/pluggable.php" );
   require_once( CUSTOM_AUTH_FORM_DIR . 'includes/main-custom-auth-form.php');
   require_once( CUSTOM_AUTH_FORM_DIR . 'includes/ajax-functions.php');
+  require_once( CUSTOM_AUTH_FORM_DIR . 'includes/custom-template.php');
   require_once( CUSTOM_AUTH_FORM_DIR . 'includes/generate-table.php');
   require_once( CUSTOM_AUTH_FORM_DIR . 'includes/generate-shortcode.php');
 
@@ -23,7 +24,6 @@
 
     register_activation_hook( __FILE__, array('CustomAuthForm', 'caf_activate') );
     register_deactivation_hook( __FILE__, array('CustomAuthForm', 'caf_deactivate') );
-
     $CustomAuthForm = new CustomAuthForm();
-    
+
   }

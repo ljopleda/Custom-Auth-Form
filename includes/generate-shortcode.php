@@ -15,9 +15,9 @@
       if (is_user_logged_in())
         wp_redirect( home_url() );
       ?>
-      <div class="container container_caf" id="container_caf_login">
+      <div class="container_caf" id="container_caf_login">
         <?php if (!is_user_logged_in()) { ?>
-        <form name="loginform" id="login" action="<?= site_url() ?>/login" method="post">
+        <form name="loginform" id="login" action="<?= site_url() ?>/account/login" method="post">
           <div class="login-input">
             <label for="user_login">Username or Email</label>
             <input type="text" name="username" id="username" class="input form-control" value="" size="20">
@@ -46,9 +46,9 @@
       if (is_user_logged_in())
         wp_redirect( home_url() );
       ?>
-      <div class="container container_caf" id="container_caf_register">
+      <div class="container_caf" id="container_caf_register">
         <p class="lbl-register">Register now, join the Divest Media team and become a member of our valued community in order to receive our daily newsletters.</p>
-        <form name="registerform" id="form-register" action="<?= site_url() ?>/register" method="post">
+        <form name="registerform" id="form-register" action="<?= site_url() ?>/account/register" method="post">
           <div><label for="rg-username">Username: </label> <input type="text" name="rg-username" id="rg-username" class="input form-control" required="required"></div>
           <div><label for="rg-fullname">Full Name: </label> <input type="text" name="rg-fullname" id="rg-fullname" class="input form-control" required="required"></div>
           <div><label for="rg-email">E-mail Address: </label> <input type="email" name="rg-email" id="rg-email" class="input form-control" required="required"></div>
@@ -63,12 +63,19 @@
     }
 
     public function generate_setpassword_form(){
-      if(empty($_GET['email'])||empty($_GET['confirm'])||is_user_logged_in()){
+      global $tisvalid;
+      $msg = '';
+      if(!$tisvalid['status']){
+        $msg = '<div class="alert alert-danger">Invalid verification token. To continue setting a password for your account, click <a href="#" class="msg-link"><b>here</b></a> to resend a new token to your email address ['.$tisvalid['email'].'].</div>';
+      }
+      if(is_user_logged_in()){
         wp_redirect( home_url() );
       }
     ?>
-      <div class="container container_caf" id="container_caf_setpassword">
-        <form name="setpasswordfrom" id="form-setpassword" action="<?= site_url() ?>/set-password" method="post">
+      <div class="container_caf" id="container_caf_setpassword">
+
+        <form name="setpasswordfrom" id="form-setpassword" action="<?= site_url() ?>/account/set-password" method="post">
+          <?=$msg?>
           <div><label for="rg-username">Password: </label> <input type="password" name="sp-password" id="sp-password" class="input form-control" required="required" /></div>
           <div><label for="rg-username">Confirm Password: </label> <input type="password" name="sp-cpassword" id="sp-cpassword" class="input form-control" required="required" /></div>
           <div>
@@ -112,13 +119,13 @@
       }else{
         $link = site_url();
         $linkparts = parse_url($link);
-        $link = rtrim($linkparts['scheme'] . '://' . $linkparts['host'] . $linkparts['path'] , '/') . '/set-password?' . http_build_query([
+        $link = rtrim($linkparts['scheme'] . '://' . $linkparts['host'] . $linkparts['path'] , '/') . '/account/set-password?' . http_build_query([
           'confirm' => $_GET['confirm'],
           'email' => $_GET['email']
         ]);
       }
       ?>
-        <div class="container container_caf" id="container_caf_successverification">
+        <div class="container_caf" id="container_caf_successverification">
           <div class="alert alert-success">You have succssfully verified your account. To set a password for your account click <a href="<?=$link?>">here</a>.</div>
         </div>
       <?php
@@ -130,8 +137,8 @@
         wp_redirect( home_url() );
       }
       ?>
-        <div class="container container_caf" id="container_caf_resetpassword">
-          <form name="setpasswordfrom" id="form-resetpassword" action="<?= site_url() ?>/forgot-password" method="post">
+        <div class="container_caf" id="container_caf_resetpassword">
+          <form name="setpasswordfrom" id="form-resetpassword" action="<?= site_url() ?>/account/forgot-password" method="post">
             <div>
               <input type="email" name="rp-email" id="rp-email" class="input form-control" required="required" placeholder="Email" />
               <button type="submit" class="btn btn-resetpassword">Reset Password</button>

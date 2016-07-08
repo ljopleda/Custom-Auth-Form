@@ -37,7 +37,7 @@
           $subject = "Lost password reset";
           $buttontxt = "Reset your password";
           $template = "reset-password";
-          $page = '/set-password?' . http_build_query([
+          $page = '/account/set-password?' . http_build_query([
             'confirm' => $token,
             'email' => $_POST['email']
           ]);
@@ -141,7 +141,7 @@
            $subject = "Please verify your account";
            $buttontxt = "Verify your Account";
            $template = "email-confirm";
-           $page = '/verify?' . http_build_query([
+           $page = '/account/verify?' . http_build_query([
              'confirm' => $token,
              'email' => $info['user_email']
            ]);
