@@ -20,36 +20,41 @@
         add_action( 'wp_ajax_nopriv_ajaxlogin', [$this,'ajax_login'] );
         add_action( 'wp_ajax_nopriv_ajaxregister', [$this,'ajax_register'] );
         add_action( 'wp_ajax_nopriv_ajaxsetpassword', [$this,'ajax_setpassword'] );
-        add_action( 'wp_ajax_nopriv_ajaxresetpassword', [$this,'ajax_resetpassword'] );
+        add_action( 'wp_ajax_nopriv_ajaxreqresetpassword', [$this,'ajax_sendreqresetpassword'] );
     }
 
-    public function ajax_resetpassword(){
+    public function ajax_sendreqresetpassword(){
       check_ajax_referer( 'ajax-resetpassword-nonce', 'security' );
       $flag = 0;
       if(!empty($_POST['email'])&&is_email($_POST['email'])){
         global $wpdb;
-        $table_users = $wpdb->prefix . 'users';
-        $user = $wpdb->get_row( 'SELECT `ID` FROM '.$table_users.' WHERE `user_email` = "'.sanitize_email( $_POST['email']).'"' );
+        $table_users = $wpdb->base_prefix . 'users';
+        $user = $wpdb->get_row( 'SELECT `ID`, `user_login` FROM '.$table_users.' WHERE `user_email` = "'.sanitize_email( $_POST['email']).'"' );
         if(!empty($user->ID)){
           $token = wp_create_nonce($_POST['email']).md5($_POST['email']);
-          $table_details = $wpdb->prefix . 'user_details';
+          global $table_prefix;
+          $table_details = $table_prefix. 'user_details';
           $wpdb->query(' UPDATE '.$table_details.' SET `token` = "'. $token .'" WHERE `user_id` = "'. $user->ID .'" ');
           $subject = "Lost password reset";
           $buttontxt = "Reset your password";
-          $template = "reset-password";
-          $page = '/account/set-password?' . http_build_query([
+          $template = "accounts-email";
+          $page = '/accounts/set-password?' . http_build_query([
             'confirm' => $token,
             'email' => $_POST['email']
           ]);
-          $this->sendConfirmationEmail($_POST['user_email'],$token,$subject,$buttontxt,$template,$page);
+          $message1 = "You have recently requested to reset your password for your Divestmedia.com account. Click the button below to reset it.";
+          $message2 = "";
+          $greetings = "Hi ".$user->user_login."!";
+          $this->sendConfirmationEmail($_POST['email'],$token,$subject,$buttontxt,$template,$page,$message1,$message2,$greetings);
           $flag = 1;
-          echo json_encode(array('status'=>$flag,'message'=>__('A password reset email has been sent to your email ['.$_POST['user_email'].'].')));
+          echo json_encode(array('status'=>$flag,'message'=>__('A password reset email has been sent to your email ['.$_POST['email'].'].')));
         }else{
           echo json_encode(array('status'=>$flag));
         }
       }else{
         echo json_encode(array('status'=>$flag));
       }
+      die();
     }
 
     public function ajax_setpassword(){
@@ -66,9 +71,10 @@
 
         if(!strcasecmp($_POST['password'],$_POST['cpassword'])){
           global $wpdb;
+          global $table_prefix;
           $password = sanitize_text_field($_POST['password']);
-          $table_users = $wpdb->prefix . 'users';
-          $table_details = $wpdb->prefix . 'user_details';
+          $table_users = $wpdb->base_prefix . 'users';
+          $table_details = $table_prefix. 'user_details';
           $user = $wpdb->get_row( ' SELECT u.`ID`,u.`user_login` FROM `'.$table_details.'` AS ud, `'.$table_users.'` AS u WHERE ud.`token` = "'. sanitize_text_field( $_POST['confirm']) .'" AND u.`ID` = ud.`user_id` AND u.`user_email` = "'. sanitize_email( $_POST['email']) .'" ' );
           if(!empty($user->ID)){
             $wpdb->query(' UPDATE `'.$table_details.'` SET `token` = "" WHERE `user_id` = "'. $user->ID .'" ');
@@ -86,7 +92,6 @@
       // First check the nonce, if it fails the function will break
       check_ajax_referer( 'ajax-login-nonce', 'security' );
 
-      // Nonce is checked, get the POST data and sign user on
       $info = array();
       $info['user_login'] = $_POST['username'];
       $info['user_password'] = $_POST['password'];
@@ -105,24 +110,22 @@
     }
 
     public function ajax_register(){
-
       // First check the nonce, if it fails the function will break
       check_ajax_referer( 'ajax-register-nonce', 'security' );
+
       if (!empty($_POST['username']) && !validate_username($_POST['username'])) {
 
       }else if(!empty($_POST['username'])){
-        // Nonce is checked, get the POST data and sign user on
         $info = array();
         $info['user_nicename'] = $info['nickname'] = $info['display_name'] = $info['first_name'] = $info['user_login'] = sanitize_user($_POST['username']) ;
         // $info['user_pass'] = sanitize_text_field($_POST['password']);
         $info['user_email'] = sanitize_email( $_POST['email']);
-
+        // $info['role'] = 'Site Member';
         // Register the user
         $user_register = wp_insert_user( $info );
 
         if ( is_wp_error($user_register) ){
           $error  = $user_register->get_error_codes()	;
-
           if(in_array('empty_user_login', $error))
             echo json_encode(array('loggedin'=>false, 'message'=>__($user_register->get_error_message('empty_user_login'))));
           elseif(in_array('existing_user_login',$error))
@@ -131,21 +134,27 @@
             echo json_encode(array('loggedin'=>false, 'message'=>__('This email address is already registered.')));
         } else {
           global $wpdb;
-          $table_name = $wpdb->prefix . 'user_details';
+          global $table_prefix;
+          $table_name = $table_prefix . 'user_details';
           $token = wp_create_nonce($info['user_email']).md5($info['user_email']);
-          $flag = $wpdb->query("INSERT into $table_name SET
+          $flag = $wpdb->query("INSERT INTO $table_name SET
                `user_id` = '". $user_register ."' ,
                `fullname` = '". sanitize_user($_POST['fullname']) ."',
-               `token` = '".$token."'
+               `token` = '".$token."',
+               `date_created` = NOW()
                ");
+
            $subject = "Please verify your account";
            $buttontxt = "Verify your Account";
-           $template = "email-confirm";
-           $page = '/account/verify?' . http_build_query([
+           $template = "accounts-email";
+           $page = '/accounts/verify?' . http_build_query([
              'confirm' => $token,
              'email' => $info['user_email']
            ]);
-           $this->sendConfirmationEmail($info['user_email'],$token,$subject,$buttontxt,$template,$page);
+           $message1 = "You have just created an account on Divest Media.";
+           $message2 = "To verify and set a password for your account, click the button below:";
+           $greetings = "Hi ".$info['user_nicename']."!";
+           $this->sendConfirmationEmail($info['user_email'],$token,$subject,$buttontxt,$template,$page,$message1,$message2,$greetings);
           //  auth_user_login($info['nickname'], $info['user_pass'], 'Registration');
           echo json_encode(array('status'=>$flag));
         }

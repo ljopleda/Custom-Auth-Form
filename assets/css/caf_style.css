@@ -1,48 +1,45 @@
-#container_caf_setpassword div input {
-  float: right;
-  width: 72% !important;
-}
 #container_caf_setpassword div.cont-btn {
-  text-align: right;
   margin: 5px;
+  text-align: right;
 }
 .container_caf {
   padding: 0 !important;
+  min-height: 340px;
+}
+.container_caf .cont-status {
+  display: none;
 }
 .container_caf form {
   font-size: 15px;
   margin: 0 auto;
-  min-width: 370px;
-  width: 50%;
 }
-.container_caf form#form-resetpassword div {
+.container_caf form .ico-append {
+  position: absolute;
+  top: 5px;
+  width: 29px;
+  height: 29px;
+  font-size: 15px;
+  line-height: 29px;
   text-align: center;
-}
-.container_caf form#form-resetpassword div input {
-  width: 65%;
-  display: inline-block;
+  right: 5px;
+  padding-left: 3px;
+  border-left-width: 1px;
+  border-left-style: solid;
 }
 .container_caf form .msg-link {
   color: #843534 !important;
 }
 .container_caf form .a-lostpassword {
-  margin-left: 30%;
-}
-.container_caf form > div {
-  min-height: 40px;
-  height: auto;
+  cursor: pointer;
 }
 .container_caf form .login-image {
   display: block;
   margin: 0 auto;
 }
-.container_caf form > input {
-  padding: 5px;
-  width: 72% !important;
-}
 .container_caf form label {
-  margin-top: 5px;
-  line-height: 15px;
+  display: block;
+  font-size: 18px;
+  position: relative;
 }
 .container_caf form .login-input label {
   float: left;
@@ -67,6 +64,40 @@
 }
 .container_caf form .submit_button {
   float: right;
+}
+.container_caf form input:not([type='checkbox']) {
+  -moz-border-radius: 4px !important;
+  -webkit-border-radius: 4px !important;
+  border-radius: 4px !important;
+  border: #dddddd 1px solid !important;
+  box-shadow: none !important;
+  height: 39px !important;
+}
+.container_caf form input:not([type='checkbox']):focus {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6) !important;
+  border-color: #66afe9 !important;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6) !important;
+  outline: 0 !important;
+}
+.container_caf form input.inp_forgot {
+  border-radius: 4px !important;
+  height: 40px !important;
+  float: left !important;
+}
+.container_caf form#form-resetpassword div {
+  text-align: center;
+}
+.container_caf form#form-resetpassword div input {
+  display: inline-block;
+  width: 65%;
+}
+.container_caf form > div {
+  height: auto;
+  min-height: 40px;
+}
+.container_caf form > input {
+  padding: 5px;
+  width: 72% !important;
 }
 .container_caf form .submit_button,
 .container_caf form .btn-register,
@@ -116,31 +147,9 @@
 }
 #container_caf_register .lbl-register {
   font-size: 17px;
-  margin: 0 auto;
-  min-width: 370px;
-  width: 50%;
-}
-#container_caf_register label {
-  display: inline-block !important;
+  margin: 5px auto;
 }
 #container_caf_register input[type="checkbox"] {
-  margin-left: 28%;
   height: 14px;
   width: 14px;
-}
-#container_caf_register input:not([type='checkbox']) {
-  -moz-border-radius: 4px !important;
-  -webkit-border-radius: 4px !important;
-  border-radius: 4px !important;
-  border: #dddddd 1px solid !important;
-  box-shadow: none !important;
-  float: right !important;
-  height: 34px !important;
-  width: 72% !important;
-}
-#container_caf_register input:not([type='checkbox']):focus {
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6) !important;
-  border-color: #66afe9 !important;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6) !important;
-  outline: 0 !important;
 }

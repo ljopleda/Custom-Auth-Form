@@ -26,7 +26,7 @@ class User_List extends WP_List_Table {
 
 		global $wpdb;
 
-		$sql = "SELECT u.display_name,u.ID,u.user_email,ud.fullname FROM {$wpdb->prefix}users AS u, {$wpdb->prefix}user_details AS ud";
+		$sql = "SELECT u.display_name,u.ID,u.user_email,ud.fullname FROM {$wpdb->base_prefix}users AS u, {$wpdb->prefix}user_details AS ud";
 	  $sql .= " WHERE u.ID = ud.user_id";
 
 		if ( ! empty( $_REQUEST['orderby'] ) ) {
@@ -52,7 +52,7 @@ class User_List extends WP_List_Table {
 		global $wpdb;
 
 		$wpdb->delete(
-			"{$wpdb->prefix}users",
+			"{$wpdb->base_prefix}users",
 			[ 'ID' => $id ],
 			[ '%d' ]
 		);
@@ -67,7 +67,7 @@ class User_List extends WP_List_Table {
 	public static function record_count() {
 		global $wpdb;
 
-		$sql = "SELECT COUNT(*) FROM {$wpdb->prefix}users";
+		$sql = "SELECT COUNT(*) FROM {$wpdb->base_prefix}users";
 
 		return $wpdb->get_var( $sql );
 	}
@@ -252,13 +252,9 @@ class User_List extends WP_List_Table {
 }
 class SP_Plugin {
 
-	// class instance
 	static $instance;
-
-	// customer WP_List_Table object
 	public $userlist;
 
-	// class constructor
 	public function __construct() {
 		add_filter( 'set-screen-option', [ __CLASS__, 'set_screen' ], 10, 3 );
     add_action('admin_init', [$this, 'admin_init']);
@@ -288,10 +284,6 @@ class SP_Plugin {
 
 	}
 
-
-	/**
-	 * Plugin settings page
-	 */
 	public function plugin_settings_page() {
 		?>
 		<div class="wrap">
@@ -338,9 +330,6 @@ class SP_Plugin {
 	<?php
 	}
 
-	/**
-	 * Screen options
-	 */
 	public function screen_option() {
 
 		$option = 'per_page';
@@ -355,8 +344,6 @@ class SP_Plugin {
 		$this->userlist = new User_List();
 	}
 
-
-	/** Singleton instance */
 	public static function get_instance() {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self();
