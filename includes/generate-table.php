@@ -26,7 +26,7 @@ class User_List extends WP_List_Table {
 
 		global $wpdb;
 
-		$sql = "SELECT u.display_name,u.ID,u.user_email,ud.fullname FROM {$wpdb->base_prefix}users AS u, {$wpdb->prefix}user_details AS ud";
+		$sql = "SELECT u.display_name,u.ID,u.user_email,ud.fullname FROM {$wpdb->base_prefix}users AS u, {$wpdb->base_prefix}user_details AS ud";
 	  $sql .= " WHERE u.ID = ud.user_id";
 
 		if ( ! empty( $_REQUEST['orderby'] ) ) {

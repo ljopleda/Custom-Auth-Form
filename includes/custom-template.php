@@ -58,6 +58,8 @@
   					// $_access = $_templateDir . '/'. $_parent .'/'. $_template .'.php';
 
             $_access = get_stylesheet_directory() . '/accounts/'.$_template.'.php';
+            if(!file_exists($_access))
+              $_access = $_templateDir . '/'. $_parent .'/'. $_template .'.php';
   					if(file_exists($_access)){
               // Change page titles
               // add_filter('pre_get_document_title', [$this,'change_the_title']);
@@ -73,7 +75,7 @@
               if(in_array($_template,$_template_wtoken)){
                 global $wpdb;
                 $userstable = $wpdb->base_prefix . 'users';
-                $userdetailstable = $wpdb->prefix . 'user_details';
+                $userdetailstable = $wpdb->base_prefix . 'user_details';
                 // Check if token and email exist in the database
                 $isvalid = $wpdb->get_row(' SELECT ud.date_created FROM '.$userstable.' AS u, '.$userdetailstable.' AS ud WHERE u.ID = ud.user_id AND ud.token = "'. sanitize_text_field($_GET['confirm']) .'" AND u.user_email = "'. sanitize_email($_GET['email']) .'" ');
 

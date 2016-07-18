@@ -32,8 +32,7 @@
         $user = $wpdb->get_row( 'SELECT `ID`, `user_login` FROM '.$table_users.' WHERE `user_email` = "'.sanitize_email( $_POST['email']).'"' );
         if(!empty($user->ID)){
           $token = wp_create_nonce($_POST['email']).md5($_POST['email']);
-          global $table_prefix;
-          $table_details = $table_prefix. 'user_details';
+          $table_details = $wpdb->base_prefix. 'user_details';
           $wpdb->query(' UPDATE '.$table_details.' SET `token` = "'. $token .'" WHERE `user_id` = "'. $user->ID .'" ');
           $subject = "Lost password reset";
           $buttontxt = "Reset your password";
@@ -71,10 +70,9 @@
 
         if(!strcasecmp($_POST['password'],$_POST['cpassword'])){
           global $wpdb;
-          global $table_prefix;
           $password = sanitize_text_field($_POST['password']);
           $table_users = $wpdb->base_prefix . 'users';
-          $table_details = $table_prefix. 'user_details';
+          $table_details = $wpdb->base_prefix. 'user_details';
           $user = $wpdb->get_row( ' SELECT u.`ID`,u.`user_login` FROM `'.$table_details.'` AS ud, `'.$table_users.'` AS u WHERE ud.`token` = "'. sanitize_text_field( $_POST['confirm']) .'" AND u.`ID` = ud.`user_id` AND u.`user_email` = "'. sanitize_email( $_POST['email']) .'" ' );
           if(!empty($user->ID)){
             $wpdb->query(' UPDATE `'.$table_details.'` SET `token` = "" WHERE `user_id` = "'. $user->ID .'" ');
@@ -134,8 +132,7 @@
             echo json_encode(array('loggedin'=>false, 'message'=>__('This email address is already registered.')));
         } else {
           global $wpdb;
-          global $table_prefix;
-          $table_name = $table_prefix . 'user_details';
+          $table_name = $wpdb->base_prefix . 'user_details';
           $token = wp_create_nonce($info['user_email']).md5($info['user_email']);
           $flag = $wpdb->query("INSERT INTO $table_name SET
                `user_id` = '". $user_register ."' ,

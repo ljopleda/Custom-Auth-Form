@@ -44,8 +44,7 @@
 
     public function caf_activate() {
       global $wpdb;
-      global $table_prefix;
-      $table_name = $table_prefix . 'user_details';
+      $table_name = $wpdb->base_prefix . 'user_details';
       if($wpdb->get_var("show tables like '$table_name'") != $table_name){
 
         $sql = "CREATE TABLE IF NOT EXISTS ".$table_name." (
@@ -59,7 +58,7 @@
         );";
         $wpdb->query($sql);
       }else{
-        $table_name = $table_prefix . 'user_details';
+        $table_name = $wpdb->base_prefix . 'user_details';
         $sql = "TRUNCATE TABLE IF EXISTS $table_name;";
         $wpdb->query($sql);
       }
@@ -71,8 +70,7 @@
 
     public function caf_deactivate() {
       global $wpdb;
-      global $table_prefix;
-      $table_name = $table_prefix . 'user_details';
+      $table_name = $wpdb->base_prefix . 'user_details';
       $sql = "DROP TABLE IF EXISTS $table_name;";
       $wpdb->query($sql);
       remove_role('site_member');
